@@ -76,10 +76,10 @@ func fetchParameters(path string, token string) ([]parameter, error) {
 func formatParameters(parameters []parameter, export bool) string {
 	var buffer strings.Builder
 	var prefix string
+	if export {
+		prefix = "export "
+	}
 	for _, parameter := range parameters {
-		if export {
-			prefix = "export "
-		}
 		buffer.WriteString(fmt.Sprintf("%s%s=%s\n", prefix, parameter.name, parameter.value))
 	}
 	return buffer.String()
