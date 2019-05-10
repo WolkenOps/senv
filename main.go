@@ -65,24 +65,22 @@ func fetchParameters(path string, token string) ([]parameter, error) {
 			name = strings.Replace(strings.Trim(name[len(path):], "/"), "/", "_", -1)
 		}
 		parameters = append(parameters, parameter{name, value})
-	}
 
-	if output.NextToken != nil {
-		parameters, err = fetchParameters(path, *output.NextToken)
+		if output.NextToken != nil {
+			parameters = fetchParametersByPath(path, *output.NextToken)
+		}
 	}
-	return parameters, nil
+	return parameters
 }
 
 func formatParameters(parameters []parameter, export bool) string {
 	var buffer strings.Builder
-	var processed string
+	var prefix string
 	for _, parameter := range parameters {
 		if export {
-			processed = fmt.Sprintf("export %s=%s\n", parameter.name, parameter.value)
-		} else {
-			processed = fmt.Sprintf("%s=%s\n", parameter.name, parameter.value)
+			prefix = "export "
 		}
-		buffer.WriteString(processed)
+		buffer.WriteString(fmt.Sprintf("%s%s=%s\n", prefix, parameter.name, parameter.value))
 	}
 	return buffer.String()
 }
