@@ -11,8 +11,7 @@ import (
 )
 
 var (
-	client     *ssm.SSM
-	parameters []parameter
+	client *ssm.SSM
 )
 
 func init() {
@@ -26,51 +25,63 @@ type parameter struct {
 }
 
 func main() {
-	path := flag.String("path", "/", "The path to look for, i.e. /dev/service")
+	paths := flag.String("paths", "/", "Comma separated paths to look for, i.e. /dev/service, /dev/global/")
 	export := flag.Bool("export", false, "The path to look for, i.e. /dev/service")
 	flag.Parse()
-
-	parameters, err := fetchParameters(*path, "")
+	parameters, err := fetchParametersByPaths(splitPaths(*paths))
 	if err != nil {
 		panic(err)
 	}
-
 	fmt.Print(formatParameters(parameters, *export))
 }
 
-func fetchParameters(path string, token string) ([]parameter, error) {
+func splitPaths(paths string) []string {
+	return strings.Split(paths, ",")
+}
+
+func fetchParametersByPaths(paths []string) ([]parameter, error) {
 	var parameters []parameter
-
-	input := &ssm.GetParametersByPathInput{
-		Path:           &path,
-		WithDecryption: aws.Bool(true),
-		Recursive:      aws.Bool(false),
-	}
-
-	if token != "" {
-		input.SetNextToken(token)
-	}
-
-	output, err := client.GetParametersByPath(input)
-
-	if err != nil {
-		return nil, err
-	}
-
-	for _, p := range output.Parameters {
-		name := *p.Name
-		value := *p.Value
-
-		if strings.Compare(path, "/") != 0 {
-			name = strings.Replace(strings.Trim(name[len(path):], "/"), "/", "_", -1)
+	for _, path := range paths {
+		p, err := fetchParametersByPath(path)
+		if err != nil {
+			return []parameter{}, err
 		}
-		parameters = append(parameters, parameter{name, value})
+		parameters = append(parameters, p...)
+	}
+	return parameters, nil
+}
 
-		if output.NextToken != nil {
-			parameters = fetchParametersByPath(path, *output.NextToken)
+func fetchParametersByPath(path string) ([]parameter, error) {
+	var parameters []parameter
+	done := false
+	var token string
+	for !done {
+		input := &ssm.GetParametersByPathInput{
+			Path:           &path,
+			WithDecryption: aws.Bool(true),
+		}
+		if token != "" {
+			input.SetNextToken(token)
+		}
+		output, err := client.GetParametersByPath(input)
+		if err != nil {
+			return []parameter{}, err
+		}
+		for _, p := range output.Parameters {
+			name := *p.Name
+			value := *p.Value
+			if strings.Compare(path, "/") != 0 {
+				name = strings.Replace(strings.Trim(name[len(path):], "/"), "/", "_", -1)
+			}
+			parameters = append(parameters, parameter{name, value})
+			if output.NextToken != nil {
+				token = *output.NextToken
+			} else {
+				done = true
+			}
 		}
 	}
-	return parameters
+	return parameters, nil
 }
 
 func formatParameters(parameters []parameter, export bool) string {
