@@ -32,7 +32,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Print(formatParameters(parameters, *export))
+	if cap(parameters) != 0 {
+		fmt.Print(formatParameters(parameters, *export))
+	} else {
+		panic("Parameters not found")
+	}
+
 }
 
 func splitPaths(paths string) []string {
