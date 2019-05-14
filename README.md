@@ -14,10 +14,16 @@ $ get -u github.com/luisc09/senv
 
 ### Using bash 
 
-Execute the following command
+Execute the following command to install in linux
 
 ```shell
-$ curl -L https://github.com/luisc09/senv/releases/download/latest/senv > /usr/local/bin/senv && chmod +x /usr/local/bin/senv
+$ curl -L https://github.com/luisc09/senv/releases/download/latest/senv-linux-amd64 > /usr/local/bin/senv && chmod +x /usr/local/bin/senv
+```
+
+To install it on MacOS execute the following command
+
+```shell
+$ curl -L https://github.com/luisc09/senv/releases/download/latest/senv-darwin-amd64 > /usr/local/bin/senv && chmod +x /usr/local/bin/senv
 ```
 
 ### Usage
