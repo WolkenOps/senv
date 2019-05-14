@@ -74,11 +74,11 @@ func fetchParametersByPath(path string) ([]parameter, error) {
 				name = strings.Replace(strings.Trim(name[len(path):], "/"), "/", "_", -1)
 			}
 			parameters = append(parameters, parameter{name, value})
-			if output.NextToken != nil {
-				token = *output.NextToken
-			} else {
-				done = true
-			}
+		}
+		if output.NextToken != nil {
+			token = *output.NextToken
+		} else {
+			done = true
 		}
 	}
 	return parameters, nil
