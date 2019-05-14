@@ -17,7 +17,7 @@ $ get -u github.com/luisc09/senv
 Execute the following command
 
 ```shell
-$ curl -L https://github.com/luisc09/senv/releases/download/latest/senv > /usr/local/bin/senv
+$ curl -L https://github.com/luisc09/senv/releases/download/latest/senv > /usr/local/bin/senv && chmod +x /usr/local/bin/senv
 ```
 
 ### Usage
