@@ -26,7 +26,7 @@ type parameter struct {
 
 func main() {
 	paths := flag.String("paths", "/", "Comma separated paths to look for, i.e. /dev/service, /dev/global/")
-	export := flag.Bool("export", false, "The path to look for, i.e. /dev/service")
+	export := flag.Bool("export", false, "If present, it will add the the export string to the variable")
 	flag.Parse()
 	parameters, err := fetchParametersByPaths(splitPaths(*paths))
 	if err != nil {
