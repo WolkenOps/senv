@@ -35,11 +35,11 @@ $ curl -L https://github.com/luisc09/senv/releases/download/latest/senv-darwin-a
     ```
 1. To format the output with `export` as prefix:
     ```shell
-    $ senv --paths /dev/myservice/environment/, /dev/global/environment --export
+    $ senv --paths /dev/myservice/environment/,/dev/global/environment --export
     ```
 1. To save the output to a file just redirect it:
     ```
-    $ senv --paths /dev/myservice/environment/, /dev/global/environment --export > .env
+    $ senv --paths /dev/myservice/environment/,/dev/global/environment --export > .env
     ```
 
 ### Docker
