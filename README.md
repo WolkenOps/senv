@@ -31,7 +31,7 @@ $ curl -L https://github.com/luisc09/senv/releases/download/latest/senv-darwin-a
 1. Set your credentials through the AWS CLI. 
 1. To format the output as dotenv execute:
     ```shell
-    $ senv --paths /dev/myservice/environment/, /dev/global/environment
+    $ senv --paths /dev/myservice/environment/,/dev/global/environment
     ```
 1. To format the output with `export` as prefix:
     ```shell
@@ -49,7 +49,7 @@ $ curl -L https://github.com/luisc09/senv/releases/download/latest/senv-darwin-a
     $ docker build -t senv -f .docker/Dockerfile .
     $ docker run -v ~/.aws/:/root/.aws/ senv --paths  /dev/myservice/environment/
     ```
-    You can additionally any AWS environment variable (in case you do not use `default`)
+    You can add any AWS environment variable (in case you do not use `default`)
     
     ```shell
     $ docker run -v ~/.aws/:/root/.aws/ -e AWS_PROFILE=myprofile -e AWS_REGION=us-east-1 senv --paths /dev/myservice/environment/
