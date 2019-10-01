@@ -20,6 +20,8 @@ func init() {
 	client = ssm.New(session)
 }
 
+var parameters map[string]string
+
 type parameter struct {
 	name  string
 	value string
@@ -33,7 +35,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if cap(parameters) != 0 {
+	if len(parameters) != 0 {
 		fmt.Print(formatParameters(parameters, *export))
 	} else {
 		panic("Parameters not found")
@@ -45,20 +47,23 @@ func splitPaths(paths string) []string {
 	return strings.Split(paths, ",")
 }
 
-func fetchParametersByPaths(paths []string) ([]parameter, error) {
-	var parameters []parameter
+func fetchParametersByPaths(paths []string) (map[string]string, error) {
+	parameters = make(map[string]string)
 	for _, path := range paths {
 		p, err := fetchParametersByPath(path)
 		if err != nil {
-			return []parameter{}, err
+			return map[string]string{}, err
 		}
-		parameters = append(parameters, p...)
+		for k, v := range p {
+ 		   parameters[k] = v
+		}
 	}
 	return parameters, nil
 }
 
-func fetchParametersByPath(path string) ([]parameter, error) {
-	var parameters []parameter
+func fetchParametersByPath(path string) (map[string]string, error) {
+	var parameters = make(map[string]string)
+
 	done := false
 	var token string
 	for !done {
@@ -71,7 +76,7 @@ func fetchParametersByPath(path string) ([]parameter, error) {
 		}
 		output, err := client.GetParametersByPath(input)
 		if err != nil {
-			return []parameter{}, err
+			return map[string]string{}, err
 		}
 		for _, p := range output.Parameters {
 			name := *p.Name
@@ -79,7 +84,7 @@ func fetchParametersByPath(path string) ([]parameter, error) {
 			if strings.Compare(path, "/") != 0 {
 				name = strings.Replace(strings.Trim(name[len(path):], "/"), "/", "_", -1)
 			}
-			parameters = append(parameters, parameter{name, value})
+			parameters[name] = value
 		}
 		if output.NextToken != nil {
 			token = *output.NextToken
@@ -90,14 +95,14 @@ func fetchParametersByPath(path string) ([]parameter, error) {
 	return parameters, nil
 }
 
-func formatParameters(parameters []parameter, export bool) string {
+func formatParameters(parameters map[string]string, export bool) string {
 	var buffer strings.Builder
 	var prefix string
 	if export {
 		prefix = "export "
 	}
-	for _, parameter := range parameters {
-		buffer.WriteString(fmt.Sprintf("%s%s=%s\n", prefix, parameter.name, parameter.value))
+	for key, value := range parameters {
+		buffer.WriteString(fmt.Sprintf("%s%s=%s\n", prefix, key, value))
 	}
 	return buffer.String()
 }

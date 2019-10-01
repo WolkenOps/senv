@@ -1,10 +1,9 @@
 package main
 
 import (
-	"testing"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ssm"
+	"testing"
 
 	"github.com/aws/aws-sdk-go/service/ssm/ssmiface"
 )
@@ -60,11 +59,8 @@ func TestFormatParameters(t *testing.T) {
 	var value string
 	parameterWExport := "export my_parameter=my_value\n"
 	parameterWOExport := "my_parameter=my_value\n"
-	parameters := []parameter{
-		parameter{
-			name:  "my_parameter",
-			value: "my_value",
-		},
+	parameters := map[string]string{
+		"my_parameter": "my_value",
 	}
 	value = formatParameters(parameters, true)
 	if parameterWExport != value {
@@ -80,7 +76,7 @@ func TestFetchParametersByPaths(t *testing.T) {
 	client = &mockSSMClient{}
 	paths := "/,/dev/"
 	validParameters := []string{
-		"/dev/my_parameter",
+		"/devss/my_parameter",
 		"/dev/my_other_parameter",
 		"my_parameter",
 		"my_other_parameter",
@@ -90,9 +86,9 @@ func TestFetchParametersByPaths(t *testing.T) {
 	if err != nil {
 		t.Errorf("an error ocurred %s", err.Error())
 	} else {
-		for _, parameter := range parameters {
-			if !contains(validParameters, parameter.name) {
-				t.Errorf("Contains unexpected values, expected %s", parameter.name)
+		for key := range parameters {
+			if !contains(validParameters, key) {
+				t.Errorf("Contains unexpected values, expected %s", key)
 			}
 		}
 	}
