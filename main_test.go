@@ -75,8 +75,8 @@ func TestFormatParameters(t *testing.T) {
 func TestFetchParametersByPaths(t *testing.T) {
 	client = &mockSSMClient{}
 	paths := "/,/dev/"
-	validParameters := []string{
-		"/devss/my_parameter",
+        validParameters := []string{
+		"/dev/my_parameter",
 		"/dev/my_other_parameter",
 		"my_parameter",
 		"my_other_parameter",
